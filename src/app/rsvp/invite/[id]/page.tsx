@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import RsvpForm from "@/components/RsvpForm";
+import { usePathname } from "next/navigation";
 
 export type InviteType = {
 	id: number;
@@ -16,17 +17,10 @@ export type InviteType = {
 	attendingNames: Array<string>;
 };
 
-export function generateStaticParams() {
-	const params: Array<{ id: number }> = [];
-
-	for (let i = 0; i < 55; i++) {
-		params.push({ id: i });
-	}
-	return params;
-}
-
-async function Page({ params }: { params: Promise<{ id: string }> }) {
-	const { id } = await params;
+function Page() {
+	const pathname = usePathname();
+	const splitPathname = pathname.split("/");
+	const id = splitPathname[splitPathname.length - 1];
 
 	const [data, setData] = useState<InviteType>();
 	const [loading, setLoading] = useState<boolean>();
