@@ -90,8 +90,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 				{attendingCount === 0 ? null : (
 					<>
 						<label>
-							Please list the first names of those attending
-							below:
+							Please list the full names of those attending below:
 						</label>
 						{Array(attendingCount)
 							.fill(0)
@@ -103,8 +102,10 @@ function RsvpForm({ invite }: RsvpFormProps) {
 											if (element) {
 												element.value =
 													invite.attendingNames ==
-													null
-														? " "
+														null ||
+													invite.attendingNames ==
+														undefined
+														? ""
 														: invite.attendingNames[
 																i
 														  ];

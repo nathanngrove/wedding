@@ -54,7 +54,7 @@ export default function RSVP() {
 				<div className="bg-white rounded-lg p-4 pb-6">
 					<h1 className="text-4xl font-bold">RSVP</h1>
 					<p className="text-lg font-semibold">
-						Please enter the naem from RSVP password card to begin.
+						Please enter the name from RSVP password card to begin.
 					</p>
 					<form className="grid gap-4" action={getInviteIdByName}>
 						<FromInput name="first-name" label="First Name" />
