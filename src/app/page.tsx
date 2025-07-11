@@ -48,7 +48,7 @@ export default function Home() {
 							className="lg:text-3xl text-2xl text-darkemerald pb-4"
 						/>
 						<a
-							href="/rsvp"
+							href="https://wedding-lemon-nu.vercel.app/rsvp"
 							className="bg-darkemerald text-white w-full rounded-md text-2xl py-2 px-4">
 							RSVP Here
 						</a>
@@ -82,6 +82,10 @@ export default function Home() {
 							}
 						/>
 						<FaqAccordion
+							summary={"What kind of food will be served?"}
+							details={"We are serving Italian cuisine."}
+						/>
+						<FaqAccordion
 							summary={
 								"Are there accommodations for out of town guests?"
 							}
@@ -92,7 +96,7 @@ export default function Home() {
 						<FaqAccordion
 							summary={"Are children welcome at the wedding?"}
 							details={
-								"Children are of course welcome at the wedding."
+								"If your children are invited, you'll have extra spots listed when you RSVP. If you are not sure, please reach out at (909) 600-3163."
 							}
 						/>
 						<FaqAccordion
@@ -102,7 +106,33 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
-
+			<section className="bg-darkemerald p-8">
+				<div className="max-w-screen-lg mx-auto flex flex-col gap-8 md:flex-row md:justify-between items-center">
+					<div>
+						<SubHeading
+							text="How it all started"
+							className={`text-white text-left max-w-screen-lg mx-auto mb-8 ${parisienne.className}`}
+						/>
+						<p className="text-white max-w-[60ch] text-md leading-10 font-serif">
+							We met at our first job at a pizza place—bonding
+							over late-night shifts, endless orders, and the
+							occasional kitchen chaos. Somewhere between dealing
+							with hangry customers and making way too many
+							breadsticks, we found something even better than a
+							paycheck. <br />
+							<br />
+							Now, we are finally making it official!
+						</p>
+					</div>
+					<Image
+						src="us.jpg"
+						alt="Us <3"
+						className="overflow-hidden block rounded-[50%] border-2 border-white outline outline-2 outline-white outline-offset-8"
+						width={300}
+						height={300}
+					/>
+				</div>
+			</section>
 			<section className={`py-16 px-8 bg-darkemerald relative`}>
 				<Image
 					src="floral-dark.jpg"
