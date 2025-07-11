@@ -103,7 +103,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 												element.value =
 													invite.attendingNames ==
 														null ||
-													invite.attendingNames ==
+													invite.attendingNames[i] ==
 														undefined
 														? ""
 														: invite.attendingNames[

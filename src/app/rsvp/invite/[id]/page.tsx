@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import RsvpForm from "@/components/RsvpForm";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export type InviteType = {
 	id: number;
@@ -21,6 +21,8 @@ function Page() {
 	const pathname = usePathname();
 	const splitPathname = pathname.split("/");
 	const id = splitPathname[splitPathname.length - 1];
+
+	const router = useRouter();
 
 	const [data, setData] = useState<InviteType>();
 	const [loading, setLoading] = useState<boolean>();
@@ -42,9 +44,17 @@ function Page() {
 				if (!res.ok) {
 					throw new Error("Network response was not ok");
 				}
+
 				const fetchedData: InviteType = await res.json();
-				console.log(fetchedData);
-				setData(fetchedData); // Update state with the fetched data
+
+				if (
+					localStorage.getItem("invite") == null ||
+					localStorage.getItem("invite") !== fetchedData.id.toString()
+				) {
+					router.push("/rsvp");
+				}
+
+				setTimeout(() => setData(fetchedData), 1000); // Update state with the fetched data
 			} catch (error) {
 				console.error("Error fetching data:", error); // Handle any errors
 			} finally {
@@ -55,7 +65,7 @@ function Page() {
 		fetchData();
 	}, [id]);
 
-	if (loading) return <div>Loading...</div>;
+	useEffect(() => {}, []);
 
 	return (
 		<main className="min-h-screen min-w-screen bg-creme p-4">
@@ -64,6 +74,7 @@ function Page() {
 					&lt; Back to home
 				</a>
 				<div className="flex flex-col gap-8">
+					<div>{loading ? "Loading..." : null}</div>
 					<div>{data ? <RsvpForm invite={data} /> : null}</div>
 				</div>
 			</div>

@@ -41,6 +41,9 @@ export default function RSVP() {
 
 			if (res.ok) {
 				const invite = await res.json();
+
+				localStorage.setItem("invite", invite.id);
+
 				router.push(`/rsvp/invite/${invite.id}`);
 			}
 		} catch (e) {
