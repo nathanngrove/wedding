@@ -104,7 +104,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			<h1 className="text-2xl font-bold">{invite.familyName}</h1>
 			<form className="grid gap-4" action={submitForm}>
 				<FormSelectInput
-					label="Are you coming?"
+					label="Will you be attending our wedding?"
 					name="coming"
 					options={["Yes", "No"]}
 					selected={isComing}
