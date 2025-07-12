@@ -31,8 +31,6 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			: invite.attendingNames
 	);
 
-	const names = useRef<HTMLInputElement[]>([]);
-
 	async function submitForm() {
 		name.forEach((n) => {
 			const validatedName = validName.safeParse(n);
