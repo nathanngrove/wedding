@@ -33,7 +33,6 @@ function RsvpForm({ invite }: RsvpFormProps) {
 
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
-	const [hasChanged, setHasChanged] = useState<boolean>(false);
 
 	async function submitForm() {
 		name.forEach((n) => {
@@ -175,7 +174,6 @@ function RsvpForm({ invite }: RsvpFormProps) {
 							name="dietary-restrictions"
 							value={dietaryRestrictions}
 							onChange={(e) => {
-								setSuccess(null);
 								setDietaryRestrictions(e.target.value);
 							}}
 							className="w-full text-xl border-black border-[1px] rounded-lg"
