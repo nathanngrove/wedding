@@ -3,11 +3,12 @@
 import React from "react";
 
 type SelectOptionProps = {
-	options: number;
+	options: number | Array<string>;
 	name: string;
-	selected: number;
+	selected: number | string;
 	disabled: boolean;
-	setSelected: React.Dispatch<React.SetStateAction<number>>;
+	setSelected?: React.Dispatch<React.SetStateAction<number>>;
+	startAtZero?: boolean;
 };
 
 function SelectOption({
@@ -16,22 +17,46 @@ function SelectOption({
 	selected,
 	disabled,
 	setSelected,
+	startAtZero,
 }: SelectOptionProps) {
-	const optionsArray = Array(options)
-		.fill(0)
-		.map((_, i) => i);
+	console.log(selected);
+
+	let selectableOptions: Array<number> | Array<string>;
+	let selectedValue: number | string;
+	if (typeof options === "number") {
+		selectableOptions = Array(options)
+			.fill(0)
+			.map((num, i) => (num = startAtZero == true ? i : i + 1));
+		selectedValue = selected;
+	} else {
+		selectableOptions = options;
+		selectedValue = selected == 0 ? "No" : "Yes";
+	}
 
 	return (
 		<select
 			id={name}
 			required
 			disabled={disabled}
-			onChange={(e) => setSelected(Number(e.target.value))}
+			onChange={
+				setSelected == undefined
+					? undefined
+					: (e) =>
+							setSelected(() => {
+								if (e.target.value == "Yes") {
+									return 1;
+								} else if (e.target.value == "No") {
+									return 0;
+								} else {
+									return Number(e.target.value);
+								}
+							})
+			}
 			name={name}
-			value={selected == null ? 0 : selected}
+			value={selectedValue}
 			className="disabled:bg-gray-300 text-xl py-2 px-4 w-full border-black border-[1px] rounded-lg">
-			{optionsArray.map((option) => (
-				<option key={option} value={option}>
+			{selectableOptions.map((option, i) => (
+				<option key={i} value={option}>
 					{option}
 				</option>
 			))}

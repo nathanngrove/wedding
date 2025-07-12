@@ -4,6 +4,12 @@ import React, { useEffect, useState } from "react";
 import RsvpForm from "@/components/RsvpForm";
 import { usePathname, useRouter } from "next/navigation";
 
+export type CombinedResponses = InviteType & {
+	inviteResponseId: number;
+	isComing: boolean;
+	dateSubmitted: Date;
+};
+
 export type InviteType = {
 	id: number;
 	familyName: string;
@@ -17,6 +23,13 @@ export type InviteType = {
 	attendingNames: Array<string>;
 };
 
+export type InviteResponseType = {
+	id: number;
+	isComing: boolean;
+	dateSubmitted: Date;
+	inviteId: number;
+};
+
 function Page() {
 	const pathname = usePathname();
 	const splitPathname = pathname.split("/");
@@ -24,37 +37,59 @@ function Page() {
 
 	const router = useRouter();
 
-	const [data, setData] = useState<InviteType>();
+	const [data, setData] = useState<CombinedResponses>();
 	const [loading, setLoading] = useState<boolean>();
 
 	useEffect(() => {
 		// Define an async function to fetch the data
 		async function fetchData() {
 			try {
-				const res = await fetch(
-					`https://rsvp-api-management.azure-api.net/api/Invite/${id}`,
-					{
-						method: "GET",
-						headers: {
-							"Ocp-Apim-Subscription-Key":
-								process.env.NEXT_PUBLIC_AZURE_OCP!,
-						},
-					}
-				);
-				if (!res.ok) {
+				const res = await Promise.all([
+					fetch(
+						`https://rsvp-api-management.azure-api.net/api/Invite/${id}`,
+						{
+							method: "GET",
+							headers: {
+								"Ocp-Apim-Subscription-Key":
+									process.env.NEXT_PUBLIC_AZURE_OCP!,
+							},
+						}
+					),
+					fetch(
+						`https://rsvp-api-management.azure-api.net/api/InviteResponse/${id}`,
+						{
+							method: "GET",
+							headers: {
+								"Ocp-Apim-Subscription-Key":
+									process.env.NEXT_PUBLIC_AZURE_OCP!,
+							},
+						}
+					),
+				]);
+				if (!res[0].ok && res[0].status !== 404) {
+					throw new Error("Network response was not ok");
+				}
+				if (!res[1].ok && res[1].status !== 404) {
 					throw new Error("Network response was not ok");
 				}
 
-				const fetchedData: InviteType = await res.json();
+				const dataInvite: InviteType = await res[0].json();
+				const dataInviteRes: InviteResponseType = await res[1].json();
+
+				const finalData: CombinedResponses =
+					dataInvite as CombinedResponses;
+				finalData.isComing = dataInviteRes.isComing;
+				finalData.inviteResponseId = dataInviteRes.id;
+				finalData.dateSubmitted = dataInviteRes.dateSubmitted;
 
 				if (
 					localStorage.getItem("invite") == null ||
-					localStorage.getItem("invite") !== fetchedData.id.toString()
+					localStorage.getItem("invite") !== dataInvite.id.toString()
 				) {
 					router.push("/rsvp");
 				}
 
-				setTimeout(() => setData(fetchedData), 1000); // Update state with the fetched data
+				setData(finalData); // Update state with the fetched data
 			} catch (error) {
 				console.error("Error fetching data:", error); // Handle any errors
 			} finally {

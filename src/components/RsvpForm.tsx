@@ -1,35 +1,39 @@
 "use client";
 
-import { InviteType } from "@/app/rsvp/invite/[id]/page";
+import { CombinedResponses } from "@/app/rsvp/invite/[id]/page";
 import React, { useState } from "react";
 import FormSelectInput from "./FormSelectInput";
 import { validName } from "@/utlis/utils";
 
 type RsvpFormProps = {
-	invite: InviteType;
+	invite: CombinedResponses;
 };
 
 function RsvpForm({ invite }: RsvpFormProps) {
-	const [error, setError] = useState<string | null>(null);
-	const [success, setSuccess] = useState<string | null>(null);
-
+	const [isComing, setIsComing] = useState<number>(
+		invite.isComing == undefined ? 0 : invite.isComing == true ? 1 : 0
+	);
 	const [vegetarianCount, setVegetarianCount] = useState<number>(
-		invite.vegetarianCount === null ? 0 : invite.vegetarianCount
+		invite.vegetarianCount == null ? 0 : invite.vegetarianCount
 	);
 	const [attendingCount, setAttendingCount] = useState<number>(
-		invite.attendingCount === null ? 0 : invite.attendingCount
+		invite.attendingCount == null ? 0 : invite.attendingCount
 	);
 	const [kidsAttendingCount, setKidsAttendingCount] = useState<number>(
-		invite.kidsAttendingCount === null ? 0 : invite.kidsAttendingCount
+		invite.kidsAttendingCount == null ? 0 : invite.kidsAttendingCount
 	);
 	const [dietaryRestrictions, setDietaryRestrictions] = useState<string>(
-		invite.dietaryRestrictions === null ? "" : invite.dietaryRestrictions
+		invite.dietaryRestrictions == null ? "" : invite.dietaryRestrictions
 	);
 	const [name, setName] = useState<Array<string>>(
 		invite.attendingNames == null
 			? Array(invite.guestCount).fill("")
 			: invite.attendingNames
 	);
+
+	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState<string | null>(null);
+	const [hasChanged, setHasChanged] = useState<boolean>(false);
 
 	async function submitForm() {
 		name.forEach((n) => {
@@ -38,7 +42,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 				setError(validatedName.error.toString());
 		});
 
-		const formData = {
+		const inviteUpdateData = {
 			FamilyName: invite.familyName,
 			GuestCount: invite.guestCount,
 			AttendingCount: attendingCount,
@@ -49,28 +53,50 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			AttendingNames: name,
 		};
 
-		try {
-			const res = await fetch(
-				`https://rsvp-api-management.azure-api.net/api/Invite/${invite.id}`,
-				{
-					method: "PUT",
-					headers: {
-						"Ocp-Apim-Subscription-Key":
-							process.env.NEXT_PUBLIC_AZURE_OCP!,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(formData),
-				}
-			);
+		const inviteResponseUpdateData = {
+			InviteId: invite.id,
+			IsComing: isComing == 0 ? false : true,
+		};
 
-			if (res.ok) {
-				await res.json();
+		try {
+			const res = await Promise.all([
+				isComing == 0
+					? null
+					: fetch(
+							`https://rsvp-api-management.azure-api.net/api/Invite/${invite.id}`,
+							{
+								method: "PUT",
+								headers: {
+									"Ocp-Apim-Subscription-Key":
+										process.env.NEXT_PUBLIC_AZURE_OCP!,
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify(inviteUpdateData),
+							}
+					  ),
+				fetch(
+					invite.isComing == undefined
+						? "https://rsvp-api-management.azure-api.net/api/InviteResponse"
+						: `https://rsvp-api-management.azure-api.net/api/InviteResponse/${invite.inviteResponseId}`,
+					{
+						method: invite.isComing == undefined ? "POST" : "PUT",
+						headers: {
+							"Ocp-Apim-Subscription-Key":
+								process.env.NEXT_PUBLIC_AZURE_OCP!,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(inviteResponseUpdateData),
+					}
+				),
+			]);
+
+			if (res[0]?.ok && res[1].ok) {
 				setSuccess(
 					"Your RSVP has been successfully submitted. Thank you!"
 				);
 			}
 		} catch (e) {
-			setError("Please make sure all inputs are valid.");
+			setError("Something went wrong.");
 		}
 	}
 
@@ -79,14 +105,21 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			<h1 className="text-2xl font-bold">{invite.familyName}</h1>
 			<form className="grid gap-4" action={submitForm}>
 				<FormSelectInput
-					name="attending"
-					options={invite.guestCount + 1}
-					selected={attendingCount}
-					setSelected={setAttendingCount}
-					label="How many of your reserved seats will be attending?"
+					label="Are you coming?"
+					name="coming"
+					options={["Yes", "No"]}
+					selected={isComing}
+					setSelected={setIsComing}
 				/>
-				{attendingCount === 0 ? null : (
+				{isComing == 0 ? null : (
 					<>
+						<FormSelectInput
+							name="attending"
+							options={invite.guestCount}
+							selected={attendingCount}
+							setSelected={setAttendingCount}
+							label="How many of your reserved seats will be attending?"
+						/>
 						<label>
 							Please list the full names of those attending below:
 						</label>
@@ -112,16 +145,15 @@ function RsvpForm({ invite }: RsvpFormProps) {
 							<FormSelectInput
 								label="Of these seats, how many are children?"
 								name="kids"
-								options={invite.kidCount + 1}
-								selected={kidsAttendingCount}
-								setSelected={setKidsAttendingCount}
+								options={invite.kidCount}
+								selected={0}
 								disabled={true}
 							/>
 						) : (
 							<FormSelectInput
 								label="Of these seats, how many are children?"
 								name="kids"
-								options={invite.kidCount + 1}
+								options={invite.kidCount}
 								setSelected={setKidsAttendingCount}
 								selected={kidsAttendingCount}
 							/>
@@ -129,9 +161,10 @@ function RsvpForm({ invite }: RsvpFormProps) {
 						<FormSelectInput
 							label="How many vegetarian meals are needed (if any)?"
 							name="veggie"
-							options={attendingCount + 1}
+							options={attendingCount}
 							selected={vegetarianCount}
 							setSelected={setVegetarianCount}
+							startAtZero={true}
 						/>
 						<label htmlFor="dietary-restrictions">
 							Does anyone in your party have food allergies we
@@ -141,9 +174,10 @@ function RsvpForm({ invite }: RsvpFormProps) {
 						<textarea
 							name="dietary-restrictions"
 							value={dietaryRestrictions}
-							onChange={(e) =>
-								setDietaryRestrictions(e.target.value)
-							}
+							onChange={(e) => {
+								setSuccess(null);
+								setDietaryRestrictions(e.target.value);
+							}}
 							className="w-full text-xl border-black border-[1px] rounded-lg"
 						/>
 					</>
@@ -153,12 +187,13 @@ function RsvpForm({ invite }: RsvpFormProps) {
 				) : null}
 				{success ? (
 					<p className="text-green-500 font-bold">{success}</p>
-				) : null}
-				<button
-					type="submit"
-					className="bg-darkemerald text-white w-full rounded-md text-3xl py-2">
-					Submit
-				</button>
+				) : (
+					<button
+						type="submit"
+						className="bg-darkemerald text-white w-full rounded-md text-3xl py-2">
+						Submit
+					</button>
+				)}
 			</form>
 		</div>
 	);
