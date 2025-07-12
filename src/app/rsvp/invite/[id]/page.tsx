@@ -65,8 +65,6 @@ function Page() {
 		fetchData();
 	}, [id]);
 
-	useEffect(() => {}, []);
-
 	return (
 		<main className="min-h-screen min-w-screen bg-creme p-4">
 			<div className="mx-auto max-w-[90vw] flex flex-col gap-4">

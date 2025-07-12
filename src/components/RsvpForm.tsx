@@ -1,7 +1,7 @@
 "use client";
 
 import { InviteType } from "@/app/rsvp/invite/[id]/page";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import FormSelectInput from "./FormSelectInput";
 import { validName } from "@/utlis/utils";
 
