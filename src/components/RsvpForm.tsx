@@ -4,7 +4,6 @@ import { InviteType } from "@/app/rsvp/invite/[id]/page";
 import React, { useRef, useState } from "react";
 import FormSelectInput from "./FormSelectInput";
 import { validName } from "@/utlis/utils";
-import { useRouter } from "next/navigation";
 
 type RsvpFormProps = {
 	invite: InviteType;
@@ -12,7 +11,7 @@ type RsvpFormProps = {
 
 function RsvpForm({ invite }: RsvpFormProps) {
 	const [error, setError] = useState<string | null>(null);
-	const router = useRouter();
+	const [success, setSuccess] = useState<string | null>(null);
 
 	const [vegetarianCount, setVegetarianCount] = useState<number>(
 		invite.vegetarianCount === null ? 0 : invite.vegetarianCount
@@ -26,15 +25,17 @@ function RsvpForm({ invite }: RsvpFormProps) {
 	const [dietaryRestrictions, setDietaryRestrictions] = useState<string>(
 		invite.dietaryRestrictions === null ? "" : invite.dietaryRestrictions
 	);
+	const [name, setName] = useState<Array<string>>(
+		invite.attendingNames == null
+			? Array(invite.guestCount).fill("")
+			: invite.attendingNames
+	);
 
 	const names = useRef<HTMLInputElement[]>([]);
 
 	async function submitForm() {
-		const namesArray: Array<string> = [];
-		names.current.map((name) => namesArray.push(name.value));
-
-		namesArray.forEach((name) => {
-			const validatedName = validName.safeParse(name);
+		name.forEach((n) => {
+			const validatedName = validName.safeParse(n);
 			if (!validatedName.success)
 				setError(validatedName.error.toString());
 		});
@@ -43,10 +44,11 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			FamilyName: invite.familyName,
 			GuestCount: invite.guestCount,
 			AttendingCount: attendingCount,
+			KidCount: invite.kidCount,
 			KidsAttendingCount: kidsAttendingCount,
 			VegetarianCount: vegetarianCount,
 			DietaryRestrictions: dietaryRestrictions,
-			AttendingNames: namesArray,
+			AttendingNames: name,
 		};
 
 		try {
@@ -63,13 +65,11 @@ function RsvpForm({ invite }: RsvpFormProps) {
 				}
 			);
 
-			if (res.status !== 200) {
-				throw new Error("Please make sure all inputs are valid.");
-			}
-
 			if (res.ok) {
 				await res.json();
-				router.push(`/`);
+				setSuccess(
+					"Your RSVP has been successfully submitted. Thank you!"
+				);
 			}
 		} catch (e) {
 			setError("Please make sure all inputs are valid.");
@@ -92,35 +92,24 @@ function RsvpForm({ invite }: RsvpFormProps) {
 						<label>
 							Please list the full names of those attending below:
 						</label>
-						{Array(attendingCount)
-							.fill(0)
-							.map((_, i) =>
-								i >= attendingCount ? null : (
-									<input
-										key={i}
-										ref={(element) => {
-											if (element) {
-												element.value =
-													invite.attendingNames ==
-														null ||
-													invite.attendingNames[i] ==
-														undefined
-														? ""
-														: invite.attendingNames[
-																i
-														  ];
-												names.current[i] = element;
-											} else {
-												// Optional: handle element removal if items can be removed
-												delete names.current[i];
-											}
-										}}
-										type="text"
-										className="text-xl py-2 px-4 w-full border-black border-[1px] rounded-lg"
-										required
-									/>
-								)
-							)}
+						{name.map((n, i) => (
+							<input
+								key={i}
+								value={n}
+								onChange={(e) =>
+									setName((prevName) => {
+										const copy = [...prevName];
+										copy[i] = e.target.value
+											? e.target.value
+											: "";
+										return copy;
+									})
+								}
+								type="text"
+								className="text-xl py-2 px-4 w-full border-black border-[1px] rounded-lg"
+								required
+							/>
+						))}
 						{invite.kidCount === 0 ? (
 							<FormSelectInput
 								label="Of these seats, how many are children?"
@@ -163,6 +152,9 @@ function RsvpForm({ invite }: RsvpFormProps) {
 				)}
 				{error ? (
 					<p className="text-red-500 font-bold">{error.toString()}</p>
+				) : null}
+				{success ? (
+					<p className="text-green-500 font-bold">{success}</p>
 				) : null}
 				<button
 					type="submit"
