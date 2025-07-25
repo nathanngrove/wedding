@@ -8,9 +8,11 @@ import { useState } from "react";
 export default function RSVP() {
 	const router = useRouter();
 
+	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
 	async function getInviteIdByName(formData: FormData) {
+		setLoading(true);
 		const firstName = formData.get("first-name");
 		const lastName = formData.get("last-name");
 
@@ -40,6 +42,7 @@ export default function RSVP() {
 			}
 
 			if (res.ok) {
+				setLoading(false);
 				const invite = await res.json();
 
 				localStorage.setItem("invite", invite.id);
@@ -70,7 +73,7 @@ export default function RSVP() {
 						<button
 							type="submit"
 							className="bg-darkemerald text-white w-full rounded-md text-3xl py-2">
-							Submit
+							{loading ? "Submitting" : "Submit"}
 						</button>
 					</form>
 				</div>

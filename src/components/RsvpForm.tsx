@@ -17,7 +17,9 @@ function RsvpForm({ invite }: RsvpFormProps) {
 		invite.vegetarianCount == null ? 0 : invite.vegetarianCount
 	);
 	const [attendingCount, setAttendingCount] = useState<number>(
-		invite.attendingCount == null ? 0 : invite.attendingCount
+		invite.attendingCount == 0 || invite.attendingCount == null
+			? 1
+			: invite.attendingCount
 	);
 	const [kidsAttendingCount, setKidsAttendingCount] = useState<number>(
 		invite.kidsAttendingCount == null ? 0 : invite.kidsAttendingCount
@@ -26,12 +28,13 @@ function RsvpForm({ invite }: RsvpFormProps) {
 		invite.dietaryRestrictions == null ? "" : invite.dietaryRestrictions
 	);
 	const [name, setName] = useState<Array<string>>(
-		invite.attendingNames == null
+		invite.attendingCount == null
 			? Array(invite.guestCount).fill("")
 			: invite.attendingNames
 	);
 
 	const [error, setError] = useState<string | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
 	const [success, setSuccess] = useState<string | null>(null);
 
 	async function submitForm() {
@@ -58,6 +61,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 		};
 
 		try {
+			setLoading(true);
 			const res = await Promise.all([
 				isComing == 0
 					? null
@@ -90,6 +94,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 			]);
 
 			if (res[0]?.ok && res[1].ok) {
+				setLoading(false);
 				setSuccess(
 					"Your RSVP has been successfully submitted. Thank you!"
 				);
@@ -122,24 +127,27 @@ function RsvpForm({ invite }: RsvpFormProps) {
 						<label>
 							Please list the full names of those attending below:
 						</label>
-						{name.map((n, i) => (
-							<input
-								key={i}
-								value={n}
-								onChange={(e) =>
-									setName((prevName) => {
-										const copy = [...prevName];
-										copy[i] = e.target.value
-											? e.target.value
-											: "";
-										return copy;
-									})
-								}
-								type="text"
-								className="text-xl py-2 px-4 w-full border-black border-[1px] rounded-lg"
-								required
-							/>
-						))}
+						{Array(attendingCount)
+							.fill("")
+							.map((n, i) => (
+								<input
+									key={i}
+									value={name[i] == null ? n : name[i]}
+									onChange={(e) =>
+										setName((prevName) => {
+											const copy = [...prevName];
+											copy[i] =
+												e.target.value !== null
+													? e.target.value
+													: "";
+											return copy;
+										})
+									}
+									type="text"
+									className="text-xl py-2 px-4 w-full border-black border-[1px] rounded-lg"
+									required
+								/>
+							))}
 						{invite.kidCount === 0 ? (
 							<FormSelectInput
 								label="Of these seats, how many are children?"
@@ -189,7 +197,7 @@ function RsvpForm({ invite }: RsvpFormProps) {
 					<button
 						type="submit"
 						className="bg-darkemerald text-white w-full rounded-md text-3xl py-2">
-						Submit
+						{loading ? "Submitting..." : "Submit"}
 					</button>
 				)}
 			</form>

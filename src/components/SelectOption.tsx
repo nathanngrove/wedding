@@ -19,14 +19,18 @@ function SelectOption({
 	setSelected,
 	startAtZero,
 }: SelectOptionProps) {
-	console.log(selected);
-
 	let selectableOptions: Array<number> | Array<string>;
 	let selectedValue: number | string;
 	if (typeof options === "number") {
-		selectableOptions = Array(options)
+		selectableOptions = Array(startAtZero == true ? options + 1 : options)
 			.fill(0)
-			.map((num, i) => (num = startAtZero == true ? i : i + 1));
+			.map((_, i) => {
+				if (startAtZero == true) {
+					return i;
+				} else {
+					return i + 1;
+				}
+			});
 		selectedValue = selected;
 	} else {
 		selectableOptions = options;
