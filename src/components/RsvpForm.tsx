@@ -78,11 +78,14 @@ function RsvpForm({ invite }: RsvpFormProps) {
 							}
 					  ),
 				fetch(
-					invite.isComing == undefined
+					invite.inviteResponseId == undefined
 						? "https://rsvp-api-management.azure-api.net/api/InviteResponse"
 						: `https://rsvp-api-management.azure-api.net/api/InviteResponse/${invite.inviteResponseId}`,
 					{
-						method: invite.isComing == undefined ? "POST" : "PUT",
+						method:
+							invite.inviteResponseId == undefined
+								? "POST"
+								: "PUT",
 						headers: {
 							"Ocp-Apim-Subscription-Key":
 								process.env.NEXT_PUBLIC_AZURE_OCP!,
