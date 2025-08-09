@@ -106,6 +106,30 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+			<section className="bg-creme p-8">
+				<div className="max-w-screen-lg mx-auto flex flex-col gap-8">
+					<div>
+						<SubHeading
+							text="Our wedding registry"
+							className={`text-darkemerald text-left max-w-screen-lg mx-auto mb-8 ${parisienne.className}`}
+						/>
+						<p>
+							Your presence at our wedding is the greatest gift of
+							all. If you'd like honor us with something extra,
+							we've created a registry here:
+						</p>
+						<a
+							target="_blank"
+							href="https://www.amazon.com/wedding/share/nathanbridgetwedding">
+							<img
+								src="amazon.png"
+								alt="Amazon wedding registy logo"
+								className="w-[80%] max-w-[400px] mx-auto py-8"
+							/>
+						</a>
+					</div>
+				</div>
+			</section>
 			<section className="bg-darkemerald p-8">
 				<div className="max-w-screen-lg mx-auto flex flex-col gap-8 md:flex-row md:justify-between items-center">
 					<div>
