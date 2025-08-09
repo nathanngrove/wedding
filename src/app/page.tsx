@@ -115,8 +115,8 @@ export default function Home() {
 						/>
 						<p>
 							Your presence at our wedding is the greatest gift of
-							all. If you'd like honor us with something extra,
-							we've created a registry here:
+							all. If you&apos;d like honor us with something
+							extra, we&apos;ve created a registry here:
 						</p>
 						<a
 							target="_blank"
