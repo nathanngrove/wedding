@@ -23,36 +23,20 @@ export default function Home() {
 					height={233}
 					className="mx-auto mt-[-1rem]"
 				/>
-				<div className="mx-auto text-center flex flex-col gap-8">
+				<div className="mx-auto text-center flex flex-col gap-8 max-w-[90%]">
 					<h1
 						className={`md:text-6xl text-4xl text-darkemerald ${parisienne.className}`}>
 						Nathan and Bridget
 					</h1>
-					<div>
-						<SubHeading
-							text="Join us on"
-							className="lg:text-3xl text-2xl text-darkemerald"
-						/>
-						<SubHeading
-							text="September 20, 2025"
-							className="lg:text-3xl text-2xl text-darkemerald font-bold"
-						/>
-						<SubHeading
-							text={`as we say "I do"`}
-							className="lg:text-3xl text-2xl text-darkemerald"
-						/>
-					</div>
-					<div>
-						<SubHeading
-							text={`Please RSVP by August 10th`}
-							className="lg:text-3xl text-2xl text-darkemerald pb-4"
-						/>
-						<a
-							href="https://wedding-lemon-nu.vercel.app/rsvp"
-							className="bg-darkemerald text-white w-full rounded-md text-2xl py-2 px-4">
-							RSVP Here
-						</a>
-					</div>
+					<SubHeading
+						text="We look forward to celebrating our special day with you. If you have any questions, use the button below to view the FAQ."
+						className="lg:text-3xl text-2xl text-darkemerald max-w-[60ch]"
+					/>
+					<a
+						href="#faq"
+						className="bg-darkemerald text-white w-full rounded-md text-2xl py-2 px-4 max-w-[400px] mx-auto">
+						View FAQ
+					</a>
 				</div>
 				<Image
 					src="white-rose.png"
@@ -62,7 +46,7 @@ export default function Home() {
 					className="translate-x-[35vw] md:translate-x-[50vw] lg:translate-x-[65vw]"
 				/>
 			</section>
-			<section className="bg-creme p-8">
+			<section className="bg-creme p-8" id="faq">
 				<div className="max-w-screen-lg mx-auto flex flex-col gap-8">
 					<div>
 						<SubHeading
