@@ -26,10 +26,22 @@ export default function useCountdown() {
 		const minutesUntilDate = hoursUntilDateRemainderInSeconds / 60;
 		const secondsUntilDate = hoursUntilDateRemainderInSeconds % 60;
 
-		setDays(daysUntilDate.toString().split(".")[0]);
-		setHours(hoursUntilDate.toString().split(".")[0]);
-		setMinutes(minutesUntilDate.toString().split(".")[0]);
-		setSeconds(secondsUntilDate.toString().split(".")[0]);
+		setDays(
+			daysUntilDate < 0 ? "0" : daysUntilDate.toString().split(".")[0]
+		);
+		setHours(
+			hoursUntilDate < 0 ? "0" : hoursUntilDate.toString().split(".")[0]
+		);
+		setMinutes(
+			minutesUntilDate < 0
+				? "0"
+				: minutesUntilDate.toString().split(".")[0]
+		);
+		setSeconds(
+			secondsUntilDate < 0
+				? "0"
+				: secondsUntilDate.toString().split(".")[0]
+		);
 	}, [currentDate]);
 
 	setTimeout(() => {
