@@ -15,6 +15,15 @@ const parisienne = Parisienne({
 export default function Home() {
 	return (
 		<>
+			<a
+				href="http://localhost:3000/chapel-parking.pdf"
+				target="_blank"
+				className="sticky top-0 z-10 w-full flex flex-row bg-blue-400 p-4">
+				<span className="mx-auto text-white">
+					Need help with parking at the chapel? Tap here for a guide
+					on where to park at the chapel.
+				</span>
+			</a>
 			<section className="flex flex-col gap-12 bg-creme overflow-x-hidden">
 				<Image
 					src="leaves.png"
