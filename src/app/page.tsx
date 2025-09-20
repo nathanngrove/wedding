@@ -16,7 +16,7 @@ export default function Home() {
 	return (
 		<>
 			<a
-				href="http://localhost:3000/chapel-parking.pdf"
+				href="/chapel-parking.pdf"
 				target="_blank"
 				className="sticky top-0 z-10 w-full flex flex-row bg-blue-400 p-4">
 				<span className="mx-auto text-white">
